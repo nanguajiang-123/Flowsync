@@ -32,3 +32,5 @@ mysql-data/
 # ====== Secrets ======
 *.pem
 *.key
+application*.yml
+!application*.sample.yml
