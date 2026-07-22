@@ -18,10 +18,10 @@ public class ProjectController {
         this.projectInfoService = projectInfoService;
     }
 
-    @Operation(summary = "获取项目列表")
+    @Operation(summary = "获取项目列表（可选按负责人筛选）")
     @GetMapping("/list")
-    public ApiResponse<?> list() {
-        return ApiResponse.ok(projectInfoService.listProjects());
+    public ApiResponse<?> list(@Parameter(description = "负责人ID（可选）") @RequestParam(required = false) Long ownerId) {
+        return ApiResponse.ok(projectInfoService.listProjects(ownerId));
     }
 
     @Operation(summary = "新增或编辑项目")
@@ -37,14 +37,15 @@ public class ProjectController {
 
         return ApiResponse.ok(
                 "保存成功",
-                projectInfoService.saveProject(project)
+                projectInfoService.saveProject(project, currentUserId)
         );
     }
 
     @Operation(summary = "删除项目")
     @DeleteMapping("/{id}")
-    public ApiResponse<?> delete(@PathVariable Long id) {
-        projectInfoService.deleteProject(id);
+    public ApiResponse<?> delete(@PathVariable Long id,
+                                  @RequestParam Long currentUserId) {
+        projectInfoService.deleteProject(id, currentUserId);
         return ApiResponse.ok("删除成功");
     }
 }

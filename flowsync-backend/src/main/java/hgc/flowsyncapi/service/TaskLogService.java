@@ -10,5 +10,5 @@ public interface TaskLogService {
     List<TaskLog> listTaskLogs(Long taskId);
 
     /** 新增进度记录 */
-    TaskLog addTaskLog(TaskLog log);
+    TaskLog addTaskLog(TaskLog log, Long operatorId);
 }

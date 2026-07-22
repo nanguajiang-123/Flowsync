@@ -10,5 +10,5 @@ public interface TaskSummaryService {
     List<TaskSummary> listSummaries();
 
     /** 新增总结 */
-    TaskSummary addSummary(TaskSummary summary);
+    TaskSummary addSummary(TaskSummary summary, Long operatorId);
 }
