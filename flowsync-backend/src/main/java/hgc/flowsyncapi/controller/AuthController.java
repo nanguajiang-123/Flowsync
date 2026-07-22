@@ -5,8 +5,11 @@ import hgc.flowsyncapi.dto.LoginRequest;
 import hgc.flowsyncapi.dto.RegisterRequest;
 import hgc.flowsyncapi.service.AuthService;
 import hgc.flowsyncapi.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "认证管理", description = "用户注册与登录")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -19,7 +22,7 @@ public class AuthController {
         this.userService = userService;
     }
 
-    /** 用户注册 */
+    @Operation(summary = "用户注册")
     @PostMapping("/register")
     public ApiResponse<?> register(@RequestBody RegisterRequest request) {
         try {
@@ -36,7 +39,7 @@ public class AuthController {
         }
     }
 
-    /** 用户登录 */
+    @Operation(summary = "用户登录")
     @PostMapping("/login")
     public ApiResponse<?> login(@RequestBody LoginRequest request) {
         try {

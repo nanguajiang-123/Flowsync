@@ -5,6 +5,8 @@ import hgc.flowsyncapi.dto.*;
 import hgc.flowsyncapi.entity.TaskInfo;
 import hgc.flowsyncapi.service.QwenService;
 import hgc.flowsyncapi.service.TaskInfoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.*;
 
+@Tag(name = "AI 助手", description = "千问大模型提供的任务建议与拆解功能")
 @RestController
 @RequestMapping("/api/ai")
 public class AiController {
@@ -25,7 +28,7 @@ public class AiController {
         this.taskInfoService = taskInfoService;
     }
 
-    /** 单任务 AI 建议 */
+    @Operation(summary = "单个任务 AI 建议")
     @PostMapping("/task-suggestion")
     public ApiResponse<?> taskSuggestion(@RequestBody AiTaskSuggestionRequest request) {
         try {
@@ -42,7 +45,7 @@ public class AiController {
         }
     }
 
-    /** AI 任务拆解 —— 新接口：入参简化，返回 JSON 数组 */
+    @Operation(summary = "AI 任务拆解")
     @PostMapping("/task-plan")
     public ApiResponse<?> taskPlan(@RequestBody Map<String, Object> request) {
         try {
@@ -58,7 +61,7 @@ public class AiController {
         }
     }
 
-    /** 导入 AI 拆解任务 */
+    @Operation(summary = "导入 AI 拆解任务")
     @PostMapping("/task-plan/import")
     public ApiResponse<?> importTaskPlan(@RequestBody AiTaskPlanImportRequest request) {
         if (request.getItems() == null || request.getItems().isEmpty()) {

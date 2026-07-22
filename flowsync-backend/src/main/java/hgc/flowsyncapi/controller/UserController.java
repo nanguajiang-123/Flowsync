@@ -3,8 +3,11 @@ package hgc.flowsyncapi.controller;
 import hgc.flowsyncapi.common.ApiResponse;
 import hgc.flowsyncapi.dto.PasswordUpdateRequest;
 import hgc.flowsyncapi.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "用户管理", description = "用户列表查询与密码修改")
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -15,13 +18,13 @@ public class UserController {
         this.userService = userService;
     }
 
-    /** 获取全部用户列表（不含密码） */
+    @Operation(summary = "获取全部用户列表")
     @GetMapping
     public ApiResponse<?> list() {
         return ApiResponse.ok(userService.listUsers());
     }
 
-    /** 修改密码 */
+    @Operation(summary = "修改密码")
     @PostMapping("/update-password")
     public ApiResponse<?> updatePassword(@RequestBody PasswordUpdateRequest request) {
         try {

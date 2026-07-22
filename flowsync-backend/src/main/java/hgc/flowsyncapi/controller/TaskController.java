@@ -3,12 +3,16 @@ package hgc.flowsyncapi.controller;
 import hgc.flowsyncapi.common.ApiResponse;
 import hgc.flowsyncapi.entity.TaskInfo;
 import hgc.flowsyncapi.service.TaskInfoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "任务管理", description = "任务的增删改查，支持按项目筛选")
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
@@ -20,8 +24,9 @@ public class TaskController {
         this.taskInfoService = taskInfoService;
     }
 
-    @GetMapping
-    public ApiResponse<?> list(@RequestParam(required = false) Long projectId) {
+    @Operation(summary = "获取任务列表")
+    @GetMapping("/list")
+    public ApiResponse<?> list(@Parameter(description = "项目ID（可选）") @RequestParam(required = false) Long projectId) {
         try {
             List<TaskInfo> list = taskInfoService.listTasks(projectId);
             return ApiResponse.ok(list);
@@ -31,7 +36,8 @@ public class TaskController {
         }
     }
 
-    @PostMapping
+    @Operation(summary = "新增或编辑任务")
+    @PostMapping("/save")
     public ApiResponse<?> save(@RequestBody TaskInfo task) {
         try {
             return ApiResponse.ok("保存成功", taskInfoService.saveTask(task));
@@ -41,6 +47,7 @@ public class TaskController {
         }
     }
 
+    @Operation(summary = "删除任务")
     @DeleteMapping("/{id}")
     public ApiResponse<?> delete(@PathVariable Long id) {
         try {
