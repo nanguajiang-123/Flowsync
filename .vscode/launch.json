@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-FlowsyncApiApplication<flowsync-api>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "hgc.flowsyncapi.FlowsyncApiApplication",
+            "projectName": "flowsync-api",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
