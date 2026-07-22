@@ -38,7 +38,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User register(String username, String password, String confirmPassword, String realName, String role) {
+    public User register(String username, String password, String confirmPassword, String realName, String role,
+                         String phone, String email) {
         if (!password.equals(confirmPassword)) {
             throw new RuntimeException("两次输入的密码不一致");
         }
@@ -56,6 +57,8 @@ public class UserServiceImpl implements UserService {
         user.setPassword(password);
         user.setRealName(realName);
         user.setRole(role);
+        user.setPhone(phone);
+        user.setEmail(email);
         userMapper.insert(user);
         user.setPassword(null);
         return user;

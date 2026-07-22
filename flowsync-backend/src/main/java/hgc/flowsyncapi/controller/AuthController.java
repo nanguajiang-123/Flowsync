@@ -28,7 +28,9 @@ public class AuthController {
                     request.getPassword(),
                     request.getConfirmPassword(),
                     request.getRealName(),
-                    request.getRole()));
+                    request.getRole(),
+                    request.getPhone(),
+                    request.getEmail()));
         } catch (RuntimeException e) {
             return ApiResponse.fail(e.getMessage());
         }

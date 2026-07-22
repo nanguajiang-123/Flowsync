@@ -16,5 +16,6 @@ public interface UserService {
     void updatePassword(Long userId, String oldPassword, String newPassword);
 
     /** 注册用户 */
-    User register(String username, String password, String confirmPassword, String realName, String role);
+    User register(String username, String password, String confirmPassword, String realName, String role,
+                 String phone, String email);
 }
