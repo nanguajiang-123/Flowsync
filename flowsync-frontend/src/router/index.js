@@ -14,8 +14,33 @@ const router = createRouter({
 })
 
 // 路由守卫：未登录跳转登录页
+const getLoginUser = () => {
+  const userStr = sessionStorage.getItem('currentUser')
+  const token = sessionStorage.getItem('token')
+
+  if (!userStr || !token) {
+    return null
+  }
+
+  try {
+    const user = JSON.parse(userStr)
+
+    if (!user || !user.id) {
+      throw new Error('用户信息不完整')
+    }
+
+    return user
+  } catch (error) {
+    sessionStorage.removeItem('currentUser')
+    sessionStorage.removeItem('token')
+    return null
+  }
+}
+
+// 路由守卫：未登录跳转登录页
 router.beforeEach((to, from, next) => {
-  const user = sessionStorage.getItem('currentUser')
+  const user = getLoginUser()
+
   if (to.meta.requiresAuth && !user) {
     next('/login')
   } else if (to.path === '/login' && user) {

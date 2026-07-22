@@ -26,8 +26,19 @@ public class ProjectController {
 
     @Operation(summary = "新增或编辑项目")
     @PostMapping("/save")
-    public ApiResponse<?> save(@RequestBody ProjectInfo project) {
-        return ApiResponse.ok("保存成功", projectInfoService.saveProject(project));
+    public ApiResponse<?> save(
+            @RequestParam Long currentUserId,
+            @RequestBody ProjectInfo project) {
+
+        // 仅新增项目时，自动将当前登录用户设为负责人
+        if (project.getId() == null) {
+            project.setOwnerId(currentUserId);
+        }
+
+        return ApiResponse.ok(
+                "保存成功",
+                projectInfoService.saveProject(project)
+        );
     }
 
     @Operation(summary = "删除项目")

@@ -38,9 +38,20 @@ public class TaskController {
 
     @Operation(summary = "新增或编辑任务")
     @PostMapping("/save")
-    public ApiResponse<?> save(@RequestBody TaskInfo task) {
+    public ApiResponse<?> save(
+            @RequestParam Long currentUserId,
+            @RequestBody TaskInfo task) {
+
         try {
-            return ApiResponse.ok("保存成功", taskInfoService.saveTask(task));
+            // 只有创建新任务时才设置创建人
+            if (task.getId() == null) {
+                task.setCreatorId(currentUserId);
+            }
+
+            return ApiResponse.ok(
+                    "保存成功",
+                    taskInfoService.saveTask(task)
+            );
         } catch (Exception e) {
             log.error("保存任务失败", e);
             return ApiResponse.fail("保存任务失败: " + e.getMessage());

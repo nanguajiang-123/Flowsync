@@ -26,7 +26,16 @@ public class TaskSummaryController {
 
     @Operation(summary = "新增总结")
     @PostMapping("/add")
-    public ApiResponse<?> add(@RequestBody TaskSummary summary) {
-        return ApiResponse.ok("新增成功", taskSummaryService.addSummary(summary));
+    public ApiResponse<?> add(
+            @RequestParam Long currentUserId,
+            @RequestBody TaskSummary summary) {
+
+        // 总结创建人以当前登录用户为准
+        summary.setCreatedBy(currentUserId);
+
+        return ApiResponse.ok(
+                "新增成功",
+                taskSummaryService.addSummary(summary)
+        );
     }
 }

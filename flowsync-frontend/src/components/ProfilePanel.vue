@@ -49,7 +49,7 @@ const handleUpdatePwd = async () => {
   if (!pwdForm.value.oldPassword || !pwdForm.value.newPassword) { ElMessage.warning('请填写完整'); return }
   if (pwdForm.value.newPassword !== pwdForm.value.confirmPassword) { ElMessage.warning('两次密码不一致'); return }
   try {
-    await updatePassword(props.currentUser.id, pwdForm.value.oldPassword, pwdForm.value.newPassword)
+    await updatePassword(pwdForm.value.oldPassword, pwdForm.value.newPassword)
     ElMessage.success('密码修改成功')
     pwdForm.value = { oldPassword: '', newPassword: '', confirmPassword: '' }
   } catch (e) {}

@@ -86,8 +86,17 @@ const handleLogin = async () => {
   try {
     const res = await login(loginForm.value.username, loginForm.value.password)
     if (res.success && res.data) {
-      sessionStorage.setItem('currentUser', JSON.stringify(res.data.user))
-      sessionStorage.setItem('token', res.data.token)
+      const user = res.data.user
+      const token = res.data.token
+
+      if (!user || !user.id || !token) {
+        ElMessage.error('登录响应数据不完整')
+        return
+      }
+
+      sessionStorage.setItem('currentUser', JSON.stringify(user))
+      sessionStorage.setItem('token', token)
+
       ElMessage.success('登录成功')
       router.push('/home')
     }

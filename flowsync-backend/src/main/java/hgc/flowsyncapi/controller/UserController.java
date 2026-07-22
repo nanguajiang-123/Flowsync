@@ -26,9 +26,17 @@ public class UserController {
 
     @Operation(summary = "修改密码")
     @PostMapping("/update-password")
-    public ApiResponse<?> updatePassword(@RequestBody PasswordUpdateRequest request) {
+    public ApiResponse<?> updatePassword(
+            @RequestParam Long currentUserId,
+            @RequestBody PasswordUpdateRequest request) {
+
         try {
-            userService.updatePassword(request.getUserId(), request.getOldPassword(), request.getNewPassword());
+            userService.updatePassword(
+                    currentUserId,
+                    request.getOldPassword(),
+                    request.getNewPassword()
+            );
+
             return ApiResponse.ok("密码修改成功");
         } catch (RuntimeException e) {
             return ApiResponse.fail(e.getMessage());

@@ -27,7 +27,16 @@ public class TaskLogController {
 
     @Operation(summary = "新增进度记录")
     @PostMapping("/add")
-    public ApiResponse<?> add(@RequestBody TaskLog log) {
-        return ApiResponse.ok("新增成功", taskLogService.addTaskLog(log));
+    public ApiResponse<?> add(
+            @RequestParam Long currentUserId,
+            @RequestBody TaskLog taskLog) {
+
+        // 操作人必须以当前登录用户为准
+        taskLog.setOperatorId(currentUserId);
+
+        return ApiResponse.ok(
+                "新增成功",
+                taskLogService.addTaskLog(taskLog)
+        );
     }
 }
