@@ -7,7 +7,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 /**
- * 跨域配置 —— 允许前端 8081 端口访问
+ * 跨域配置 —— 允许所有来源访问
  */
 @Configuration
 public class CorsConfig {
@@ -15,8 +15,7 @@ public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOriginPattern("http://localhost:8081");
-        config.addAllowedOriginPattern("http://127.0.0.1:8081");
+        config.addAllowedOriginPattern("*");
         config.setAllowCredentials(true);
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");

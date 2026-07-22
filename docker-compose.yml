@@ -3,11 +3,11 @@ version: "3.8"
 services:
   mysql:
     image: mysql:8.0
-    container_name: route
+    container_name: flowsync-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: route
-      MYSQL_DATABASE: route
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: flowsync_simple
       TZ: Asia/Shanghai
     ports:
       - "3306:3306"
