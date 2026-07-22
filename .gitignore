@@ -1,0 +1,34 @@
+# ====== IDE ======
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# ====== Java / Maven ======
+target/
+*.class
+*.jar
+*.war
+!gradle-wrapper.jar
+
+# ====== Node / Vue ======
+node_modules/
+dist/
+.env.local
+.env.*.local
+*.log
+npm-debug.log*
+
+# ====== OS ======
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ====== Docker ======
+mysql-data/
+
+# ====== Secrets ======
+*.pem
+*.key
