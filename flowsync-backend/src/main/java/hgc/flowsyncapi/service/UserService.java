@@ -14,4 +14,7 @@ public interface UserService {
 
     /** 修改密码 */
     void updatePassword(Long userId, String oldPassword, String newPassword);
+
+    /** 注册用户 */
+    User register(String username, String password, String confirmPassword, String realName, String role);
 }

@@ -2,7 +2,9 @@ package hgc.flowsyncapi.controller;
 
 import hgc.flowsyncapi.common.ApiResponse;
 import hgc.flowsyncapi.dto.LoginRequest;
+import hgc.flowsyncapi.dto.RegisterRequest;
 import hgc.flowsyncapi.service.AuthService;
+import hgc.flowsyncapi.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -10,9 +12,26 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserService userService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, UserService userService) {
         this.authService = authService;
+        this.userService = userService;
+    }
+
+    /** 用户注册 */
+    @PostMapping("/register")
+    public ApiResponse<?> register(@RequestBody RegisterRequest request) {
+        try {
+            return ApiResponse.ok("注册成功", userService.register(
+                    request.getUsername(),
+                    request.getPassword(),
+                    request.getConfirmPassword(),
+                    request.getRealName(),
+                    request.getRole()));
+        } catch (RuntimeException e) {
+            return ApiResponse.fail(e.getMessage());
+        }
     }
 
     /** 用户登录 */
