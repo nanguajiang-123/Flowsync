@@ -1,6 +1,6 @@
 package hgc.flowsyncapi.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import hgc.flowsyncapi.entity.TaskInfo;
 import hgc.flowsyncapi.mapper.TaskInfoMapper;
 import hgc.flowsyncapi.service.TaskInfoService;
@@ -19,11 +19,11 @@ public class TaskInfoServiceImpl implements TaskInfoService {
 
     @Override
     public List<TaskInfo> listTasks(Long projectId) {
-        LambdaQueryWrapper<TaskInfo> wrapper = new LambdaQueryWrapper<>();
+        QueryWrapper<TaskInfo> wrapper = new QueryWrapper<>();
         if (projectId != null) {
-            wrapper.eq(TaskInfo::getProjectId, projectId);
+            wrapper.eq("project_id", projectId);
         }
-        wrapper.orderByDesc(TaskInfo::getId);
+        wrapper.orderByDesc("id");
         return taskInfoMapper.selectList(wrapper);
     }
 

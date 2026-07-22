@@ -1,6 +1,6 @@
 package hgc.flowsyncapi.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import hgc.flowsyncapi.entity.TaskLog;
 import hgc.flowsyncapi.mapper.TaskLogMapper;
 import hgc.flowsyncapi.service.TaskLogService;
@@ -19,11 +19,11 @@ public class TaskLogServiceImpl implements TaskLogService {
 
     @Override
     public List<TaskLog> listTaskLogs(Long taskId) {
-        LambdaQueryWrapper<TaskLog> wrapper = new LambdaQueryWrapper<>();
+        QueryWrapper<TaskLog> wrapper = new QueryWrapper<>();
         if (taskId != null) {
-            wrapper.eq(TaskLog::getTaskId, taskId);
+            wrapper.eq("task_id", taskId);
         }
-        wrapper.orderByDesc(TaskLog::getId);
+        wrapper.orderByDesc("id");
         return taskLogMapper.selectList(wrapper);
     }
 
