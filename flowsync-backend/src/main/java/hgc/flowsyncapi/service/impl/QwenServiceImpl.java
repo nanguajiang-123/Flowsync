@@ -9,20 +9,18 @@ import com.alibaba.dashscope.exception.ApiException;
 import com.alibaba.dashscope.exception.InputRequiredException;
 import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hgc.flowsyncapi.dto.AiTaskPlanItem;
-import hgc.flowsyncapi.dto.AiTaskPlanResponse;
-import hgc.flowsyncapi.entity.User;
 import hgc.flowsyncapi.service.QwenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Service
 public class QwenServiceImpl implements QwenService {
@@ -34,18 +32,26 @@ public class QwenServiceImpl implements QwenService {
 
     private final ObjectMapper objectMapper;
 
-    private static final String SYSTEM_PROMPT_TASK_SUGGESTION =
-        "你是一个简单直接的项目任务助手。\n" +
-        "请用最容易理解的中文输出，给出：\n" +
-        "1. 建议拆分的子任务；2. 执行顺序；3. 风险提醒。\n" +
-        "控制在300字以内。";
+    // ---- 优化后的提示词 ----
+    private static final String SYSTEM_PROMPT =
+        "你是项目管理专家。规则：" +
+        "1.任务拆解遵循MECE原则；" +
+        "2.颗粒度适中；" +
+        "3.taskdesc需含动作与交付物；" +
+        "4.严格按用户指定JSON格式输出；" +
+        "5.禁止输出JSON以外任何文字、注释、markdown或解释。";
 
-    private static final String SYSTEM_PROMPT_TASK_PLAN =
-        "你是一个项目任务拆解助手。\n" +
-        "请把大任务拆成可以直接执行的小任务。\n" +
-        "我会给你可选的成员名单，请为每个任务推荐一个最合适的负责人，在 assigneeId 字段填写该成员的 id（必须是名单中已有的 id）。\n" +
-        "重要：每个任务都必须填写 assigneeId，不能为空；同一个人可以负责多个任务。\n" +
-        "只返回严格 JSON，不要解释，不要 markdown。";
+    private static final String SYSTEM_PROMPT_SUGGESTION =
+        "你是一个简单直接的项目任务助手。请用最容易理解的中文输出，控制在300字以内。";
+
+    // 姓名 → ID 映射
+    private static final Map<String, Long> NAME_TO_ID = new LinkedHashMap<>();
+    static {
+        NAME_TO_ID.put("项目负责人", 2L);
+        NAME_TO_ID.put("张三", 3L);
+        NAME_TO_ID.put("李四", 4L);
+        NAME_TO_ID.put("系统管理员", 1L);
+    }
 
     public QwenServiceImpl(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
@@ -56,105 +62,79 @@ public class QwenServiceImpl implements QwenService {
         String userPrompt = String.format(
             "项目名称：%s\n任务标题：%s\n任务说明：%s\n请给出子任务拆分建议。",
             projectName, taskTitle, taskDescription);
-
-        return callQwen(SYSTEM_PROMPT_TASK_SUGGESTION, userPrompt, 300);
+        return callQwen(SYSTEM_PROMPT_SUGGESTION, userPrompt, 300);
     }
 
     @Override
-    public AiTaskPlanResponse generateTaskPlan(String projectName, String goal,
-                                                String description, List<User> members) {
-        // 构建成员名单字符串
-        StringBuilder memberList = new StringBuilder();
-        for (User u : members) {
-            memberList.append(u.getId()).append(" - ").append(u.getRealName()).append("\n");
-        }
-
+    public List<AiTaskPlanItem> generateTaskPlan(String projectName) {
+        String today = LocalDate.now().toString();
         String userPrompt = String.format(
-            "项目名称：%s\n任务目标：%s\n补充说明：%s\n可选成员名单（id - 姓名）：\n%s",
-            projectName, goal,
-            description != null ? description : "无",
-            memberList.toString());
+            "拆解%s为JSON数组。字段：projectname(固定值)，taskdesc，assignee(限项目负责人/张三/李四)，" +
+            "status(固定未开始),priority(优先级:高、中、低),dueDate(截止日期:yyyy-MM-dd)," +
+            "createTime(创建时间:yyyy-MM-dd当前日期为%s)。覆盖全流程，合理分工，仅返回JSON。",
+            projectName, today);
 
-        String rawJson = callQwen(SYSTEM_PROMPT_TASK_PLAN, userPrompt, 2000);
+        log.info("调用千问拆解: {}", projectName);
 
         try {
-            AiTaskPlanResponse response = objectMapper.readValue(rawJson, AiTaskPlanResponse.class);
+            String raw = callQwen(SYSTEM_PROMPT, userPrompt, 2000);
+            String clean = raw.trim().replaceAll("```json\\s*", "").replaceAll("```\\s*", "").trim();
+            List<AiTaskPlanItem> items = objectMapper.readValue(clean, new TypeReference<List<AiTaskPlanItem>>() {});
 
-            // 校验负责人 ID 有效性
-            Set<Long> validIds = members.stream().map(User::getId).collect(Collectors.toSet());
-            Long fallbackId = members.isEmpty() ? null : members.get(0).getId();
-
-            if (response.getItems() != null) {
-                for (AiTaskPlanItem item : response.getItems()) {
-                    if (item.getAssigneeId() == null || !validIds.contains(item.getAssigneeId())) {
-                        item.setAssigneeId(fallbackId);
-                    }
-                }
+            for (AiTaskPlanItem item : items) {
+                item.setAssigneeId(NAME_TO_ID.getOrDefault(item.getAssignee(), 2L));
+                item.setTitle(item.getTaskdesc());
+                item.setDescription(item.getTaskdesc());
+                if (item.getDueDate() != null && !item.getDueDate().isEmpty()) {
+                    try {
+                        long days = ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(item.getDueDate()));
+                        item.setSuggestedDays((int) Math.max(1, days));
+                    } catch (Exception e) { item.setSuggestedDays(3); }
+                } else { item.setSuggestedDays(3); }
             }
-            return response;
-
+            return items;
         } catch (JsonProcessingException e) {
-            log.error("千问返回 JSON 解析失败，使用兜底方案。原始返回: {}", rawJson, e);
-            return buildFallbackPlan();
+            log.error("JSON解析失败", e);
+            return buildFallback(projectName);
+        } catch (Exception e) {
+            log.error("千问调用异常", e);
+            return buildFallback(projectName);
         }
     }
 
-    /** 兜底方案 */
-    private AiTaskPlanResponse buildFallbackPlan() {
-        AiTaskPlanResponse fallback = new AiTaskPlanResponse();
-        fallback.setSummary("AI 暂时无法提供服务，以下为系统默认拆解方案，请手动分配负责人。");
-
-        AiTaskPlanItem item1 = new AiTaskPlanItem();
-        item1.setTitle("准备资料");
-        item1.setDescription("收集和整理项目所需的相关资料与文档");
-        item1.setPriority("高");
-        item1.setSuggestedDays(2);
-        item1.setAssigneeId(null);
-
-        AiTaskPlanItem item2 = new AiTaskPlanItem();
-        item2.setTitle("执行主体");
-        item2.setDescription("按照计划完成项目核心工作内容");
-        item2.setPriority("高");
-        item2.setSuggestedDays(5);
-        item2.setAssigneeId(null);
-
-        AiTaskPlanItem item3 = new AiTaskPlanItem();
-        item3.setTitle("检查总结");
-        item3.setDescription("检查完成情况，整理项目总结报告");
-        item3.setPriority("中");
-        item3.setSuggestedDays(2);
-        item3.setAssigneeId(null);
-
-        fallback.setItems(Arrays.asList(item1, item2, item3));
-        return fallback;
+    private List<AiTaskPlanItem> buildFallback(String projectName) {
+        String today = LocalDate.now().toString();
+        List<AiTaskPlanItem> list = new ArrayList<>();
+        AiTaskPlanItem i1 = new AiTaskPlanItem();
+        i1.setProjectname(projectName); i1.setTaskdesc("准备资料，梳理需求文档"); i1.setAssignee("项目负责人");
+        i1.setStatus("未开始"); i1.setPriority("高"); i1.setDueDate(today); i1.setCreateTime(today);
+        i1.setAssigneeId(2L); i1.setTitle(i1.getTaskdesc()); i1.setDescription(i1.getTaskdesc()); i1.setSuggestedDays(2);
+        AiTaskPlanItem i2 = new AiTaskPlanItem();
+        i2.setProjectname(projectName); i2.setTaskdesc("执行主体任务，完成核心开发"); i2.setAssignee("张三");
+        i2.setStatus("未开始"); i2.setPriority("高"); i2.setDueDate(today); i2.setCreateTime(today);
+        i2.setAssigneeId(3L); i2.setTitle(i2.getTaskdesc()); i2.setDescription(i2.getTaskdesc()); i2.setSuggestedDays(5);
+        AiTaskPlanItem i3 = new AiTaskPlanItem();
+        i3.setProjectname(projectName); i3.setTaskdesc("检查总结，整理答辩材料"); i3.setAssignee("李四");
+        i3.setStatus("未开始"); i3.setPriority("中"); i3.setDueDate(today); i3.setCreateTime(today);
+        i3.setAssigneeId(4L); i3.setTitle(i3.getTaskdesc()); i3.setDescription(i3.getTaskdesc()); i3.setSuggestedDays(2);
+        list.add(i1); list.add(i2); list.add(i3);
+        return list;
     }
 
-    /** 调用千问大模型 */
     private String callQwen(String systemPrompt, String userPrompt, int maxTokens) {
         try {
             Generation gen = new Generation();
-            Message sysMsg = Message.builder()
-                    .role(Role.SYSTEM.getValue())
-                    .content(systemPrompt)
-                    .build();
-            Message userMsg = Message.builder()
-                    .role(Role.USER.getValue())
-                    .content(userPrompt)
-                    .build();
-
             GenerationParam param = GenerationParam.builder()
-                    .apiKey(apiKey)
-                    .model("qwen-plus")
-                    .messages(Arrays.asList(sysMsg, userMsg))
+                    .apiKey(apiKey).model("qwen-plus")
+                    .messages(Arrays.asList(
+                        Message.builder().role(Role.SYSTEM.getValue()).content(systemPrompt).build(),
+                        Message.builder().role(Role.USER.getValue()).content(userPrompt).build()))
                     .resultFormat(GenerationParam.ResultFormat.MESSAGE)
-                    .maxTokens(maxTokens)
-                    .build();
-
-            GenerationResult result = gen.call(param);
-            return result.getOutput().getChoices().get(0).getMessage().getContent().toString();
-
-        } catch (NoApiKeyException | ApiException | InputRequiredException e) {
-            log.error("千问调用失败", e);
+                    .maxTokens(maxTokens).build();
+            return gen.call(param).getOutput().getChoices().get(0).getMessage().getContent().toString();
+        } catch (NoApiKeyException e) {
+            throw new RuntimeException("AI 服务未配置有效的 API Key");
+        } catch (ApiException | InputRequiredException e) {
             throw new RuntimeException("AI 服务调用失败: " + e.getMessage());
         }
     }

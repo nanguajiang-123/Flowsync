@@ -4,8 +4,9 @@ export function getTaskSuggestion(projectName, taskTitle, taskDescription) {
   return request.post('/api/ai/task-suggestion', { projectName, taskTitle, taskDescription })
 }
 
-export function getTaskPlan(projectId, operatorId, projectName, goal, description) {
-  return request.post('/api/ai/task-plan', { projectId, operatorId, projectName, goal, description })
+/** AI 任务拆解 —— 新接口，只需传入 projectName */
+export function getTaskPlan(projectName) {
+  return request.post('/api/ai/task-plan', { projectName })
 }
 
 export function importTaskPlan(projectId, creatorId, items) {
