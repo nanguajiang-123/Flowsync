@@ -19,13 +19,13 @@ public class TaskSummaryController {
     }
 
     @Operation(summary = "获取总结列表")
-    @GetMapping
+    @GetMapping("/list")
     public ApiResponse<?> list() {
         return ApiResponse.ok(taskSummaryService.listSummaries());
     }
 
     @Operation(summary = "新增总结")
-    @PostMapping
+    @PostMapping("/add")
     public ApiResponse<?> add(@RequestBody TaskSummary summary) {
         return ApiResponse.ok("新增成功", taskSummaryService.addSummary(summary));
     }

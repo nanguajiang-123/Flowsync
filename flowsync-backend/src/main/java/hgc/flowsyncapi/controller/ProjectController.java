@@ -19,13 +19,13 @@ public class ProjectController {
     }
 
     @Operation(summary = "获取项目列表")
-    @GetMapping
+    @GetMapping("/list")
     public ApiResponse<?> list() {
         return ApiResponse.ok(projectInfoService.listProjects());
     }
 
     @Operation(summary = "新增或编辑项目")
-    @PostMapping
+    @PostMapping("/save")
     public ApiResponse<?> save(@RequestBody ProjectInfo project) {
         return ApiResponse.ok("保存成功", projectInfoService.saveProject(project));
     }

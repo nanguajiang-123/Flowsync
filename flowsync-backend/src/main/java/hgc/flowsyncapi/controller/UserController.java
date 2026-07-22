@@ -19,7 +19,7 @@ public class UserController {
     }
 
     @Operation(summary = "获取全部用户列表")
-    @GetMapping
+    @GetMapping("/list")
     public ApiResponse<?> list() {
         return ApiResponse.ok(userService.listUsers());
     }

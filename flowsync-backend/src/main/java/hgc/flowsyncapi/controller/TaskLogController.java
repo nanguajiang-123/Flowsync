@@ -20,13 +20,13 @@ public class TaskLogController {
     }
 
     @Operation(summary = "获取进度记录列表")
-    @GetMapping
+    @GetMapping("/list")
     public ApiResponse<?> list(@Parameter(description = "任务ID（可选）") @RequestParam(required = false) Long taskId) {
         return ApiResponse.ok(taskLogService.listTaskLogs(taskId));
     }
 
     @Operation(summary = "新增进度记录")
-    @PostMapping
+    @PostMapping("/add")
     public ApiResponse<?> add(@RequestBody TaskLog log) {
         return ApiResponse.ok("新增成功", taskLogService.addTaskLog(log));
     }
