@@ -42,17 +42,12 @@ public class ProjectController {
             if (existing == null) {
                 return ApiResponse.fail("项目不存在");
             }
-            if (!currentUserId.equals(existing.getOwnerId())) {
-                return ApiResponse.fail("权限不足：您不是该项目的负责人");
-            }
+            SecurityUtils.requireOwner(existing.getOwnerId());
         } else {
             // 新建：只有"负责人"角色可以创建项目
-            if (!"负责人".equals(SecurityUtils.getCurrentRole())) {
-                return ApiResponse.fail("权限不足：仅项目负责人可创建项目");
-            }
+            SecurityUtils.requireLeaderRole();
         }
 
-        // DTO → Entity
         ProjectInfo project = new ProjectInfo();
         project.setId(request.getId());
         project.setName(request.getName());
@@ -70,18 +65,13 @@ public class ProjectController {
     @Operation(summary = "删除项目")
     @DeleteMapping("/{id}")
     public ApiResponse<?> delete(@PathVariable Long id) {
-        Long currentUserId = SecurityUtils.getCurrentUserId();
-
-        // 只有项目负责人本人可以删除
         ProjectInfo existing = projectInfoMapper.selectById(id);
         if (existing == null) {
             return ApiResponse.fail("项目不存在");
         }
-        if (!currentUserId.equals(existing.getOwnerId())) {
-            return ApiResponse.fail("权限不足：您不是该项目的负责人");
-        }
+        SecurityUtils.requireOwner(existing.getOwnerId());
 
-        projectInfoService.deleteProject(id, currentUserId);
+        projectInfoService.deleteProject(id, SecurityUtils.getCurrentUserId());
         return ApiResponse.ok("删除成功");
     }
 }

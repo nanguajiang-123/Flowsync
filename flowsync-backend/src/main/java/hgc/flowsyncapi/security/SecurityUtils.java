@@ -41,4 +41,27 @@ public class SecurityUtils {
     public static String getCurrentRole() {
         return currentRole.get();
     }
+
+    // ==================== 权限校验 ====================
+
+    /** 校验当前用户是否是"负责人"角色 */
+    public static void requireLeaderRole() {
+        if (!"负责人".equals(getCurrentRole())) {
+            throw new RuntimeException("权限不足：仅项目负责人可操作");
+        }
+    }
+
+    /** 校验当前用户是否是目标 owner（用于项目编辑/删除） */
+    public static void requireOwner(Long ownerId) {
+        if (!getCurrentUserId().equals(ownerId)) {
+            throw new RuntimeException("权限不足：您不是该项目的负责人");
+        }
+    }
+
+    /** 校验当前用户是否是目标创建者（用于任务编辑/删除） */
+    public static void requireCreator(Long creatorId) {
+        if (!getCurrentUserId().equals(creatorId)) {
+            throw new RuntimeException("权限不足：您不是该任务的创建者");
+        }
+    }
 }
