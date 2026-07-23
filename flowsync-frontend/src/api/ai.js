@@ -9,6 +9,6 @@ export function getTaskPlan(projectName) {
   return request.post('/api/ai/task-plan', { projectName })
 }
 
-export function importTaskPlan(projectId, creatorId, items) {
-  return request.post('/api/ai/task-plan/import', { projectId, creatorId, items })
+export function importTaskPlan(projectId, items) {
+  return request.post('/api/ai/task-plan/import', { projectId, items })
 }

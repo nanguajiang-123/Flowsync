@@ -13,38 +13,43 @@ const normalizeResponseData = (data) => {
   return { success: true, message: '操作成功', data }
 }
 
-// 不需要 currentUserId 的接口
-const shouldSkipCurrentUserId = (url = '') => {
+const getAuthToken = () => {
+  try {
+    const token = sessionStorage.getItem('token')
+    if (token) return token
+
+    const userStr = sessionStorage.getItem('currentUser')
+    if (!userStr) return ''
+
+    const user = JSON.parse(userStr)
+    return user?.token || ''
+  } catch (error) {
+    console.error('当前用户信息解析失败：', error)
+    sessionStorage.removeItem('currentUser')
+    sessionStorage.removeItem('token')
+    return ''
+  }
+}
+
+const shouldSkipAuth = (url = '') => {
   return (
     url === '/api/auth/login' ||
-    url === '/api/auth/register' ||
-    url.startsWith('/api/ai/')
+    url === '/api/auth/register'
   )
 }
 
-// 请求拦截器：自动附加 currentUserId
+// 请求拦截器：自动附加 JWT Authorization 头
 request.interceptors.request.use(
   config => {
-    if (shouldSkipCurrentUserId(config.url)) {
+    if (shouldSkipAuth(config.url)) {
       return config
     }
 
-    const userStr = sessionStorage.getItem('currentUser')
-
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr)
-
-        if (user && user.id) {
-          config.params = {
-            ...(config.params || {}),
-            currentUserId: user.id
-          }
-        }
-      } catch (error) {
-        console.error('当前用户信息解析失败：', error)
-        sessionStorage.removeItem('currentUser')
-        sessionStorage.removeItem('token')
+    const token = getAuthToken()
+    if (token) {
+      config.headers = {
+        ...(config.headers || {}),
+        Authorization: `Bearer ${token}`
       }
     }
 
