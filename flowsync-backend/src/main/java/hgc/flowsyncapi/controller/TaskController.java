@@ -45,12 +45,9 @@ public class TaskController {
             if (existing == null) {
                 return ApiResponse.fail("任务不存在");
             }
-            if (!currentUserId.equals(existing.getCreatorId())) {
-                return ApiResponse.fail("权限不足：您不是该任务的创建者");
-            }
+            SecurityUtils.requireCreator(existing.getCreatorId());
         }
 
-        // DTO → Entity
         TaskInfo task = new TaskInfo();
         task.setId(request.getId());
         task.setProjectId(request.getProjectId());
@@ -71,18 +68,13 @@ public class TaskController {
     @Operation(summary = "删除任务")
     @DeleteMapping("/{id}")
     public ApiResponse<?> delete(@PathVariable Long id) {
-        Long currentUserId = SecurityUtils.getCurrentUserId();
-
-        // 只有任务创建者本人可以删除
         TaskInfo existing = taskInfoMapper.selectById(id);
         if (existing == null) {
             return ApiResponse.fail("任务不存在");
         }
-        if (!currentUserId.equals(existing.getCreatorId())) {
-            return ApiResponse.fail("权限不足：您不是该任务的创建者");
-        }
+        SecurityUtils.requireCreator(existing.getCreatorId());
 
-        taskInfoService.deleteTask(id, currentUserId);
+        taskInfoService.deleteTask(id, SecurityUtils.getCurrentUserId());
         return ApiResponse.ok("删除成功");
     }
 }
