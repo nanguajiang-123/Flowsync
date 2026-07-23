@@ -7,7 +7,7 @@
     </div>
 
     <el-card class="table-card" shadow="hover">
-      <el-table :data="summaries" border stripe style="width:100%">
+      <el-table :data="summaries" border stripe style="width:100%" :row-style="({ row }) => ({ minHeight: Math.max(48, Math.min(96, Math.ceil((row.content?.length || 0) / 36) * 24 + 16)) + 'px' })">
         <el-table-column label="编号" prop="id" width="70" align="center" />
         <el-table-column label="所属项目" prop="projectId" width="100" align="center" />
         <el-table-column label="关联任务" prop="taskId" width="100" align="center">
@@ -18,7 +18,11 @@
             <el-tag :type="row.summaryType === '最终总结' ? 'success' : 'warning'">{{ row.summaryType }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="总结内容" prop="content" min-width="300" show-overflow-tooltip />
+        <el-table-column label="总结内容" prop="content" min-width="300">
+          <template #default="{ row }">
+            <div style="white-space: pre-wrap; word-break: break-word; line-height: 1.5;">{{ row.content || '-' }}</div>
+          </template>
+        </el-table-column>
         <el-table-column label="创建人" prop="createdBy" width="90" align="center" />
         <el-table-column label="时间" prop="createTime" width="170" align="center" />
       </el-table>

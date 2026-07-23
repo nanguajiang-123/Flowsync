@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <el-card class="login-card" shadow="always">
-      <h2>🔗 FlowSync</h2>
+      <h2>FlowSync</h2>
       <p style="text-align:center;color:#909399;margin-bottom:24px;">小组任务协同管理系统</p>
 
       <!-- ===== 登录模式 ===== -->
@@ -35,6 +35,12 @@
         </el-form-item>
         <el-form-item>
           <el-input v-model="registerForm.realName" placeholder="真实姓名" size="large" prefix-icon="User" />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="registerForm.phone" placeholder="联系电话（选填）" size="large" prefix-icon="Phone" />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="registerForm.email" placeholder="邮箱（选填）" size="large" prefix-icon="Message" />
         </el-form-item>
         <el-form-item>
           <el-select v-model="registerForm.role" placeholder="请选择角色" size="large" style="width:100%">
@@ -75,7 +81,7 @@ const router = useRouter()
 const loading = ref(false)
 const isRegister = ref(false)
 const loginForm = ref({ username: '', password: '' })
-const registerForm = ref({ username: '', password: '', confirmPassword: '', realName: '', role: '' })
+const registerForm = ref({ username: '', password: '', confirmPassword: '', realName: '', phone: '', email: '', role: '' })
 
 const handleLogin = async () => {
   if (!loginForm.value.username || !loginForm.value.password) {
@@ -85,21 +91,20 @@ const handleLogin = async () => {
   loading.value = true
   try {
     const res = await login(loginForm.value.username, loginForm.value.password)
-    if (res.success && res.data) {
-      const user = res.data.user
-      const token = res.data.token
+    const payload = res?.data || res
+    const user = payload?.user || payload
+    const token = payload?.token || sessionStorage.getItem('token')
 
-      if (!user || !user.id || !token) {
-        ElMessage.error('登录响应数据不完整')
-        return
-      }
-
-      sessionStorage.setItem('currentUser', JSON.stringify(user))
-      sessionStorage.setItem('token', token)
-
-      ElMessage.success('登录成功')
-      router.push('/home')
+    if (!user || !user.id || !token) {
+      ElMessage.error('登录响应数据不完整')
+      return
     }
+
+    sessionStorage.setItem('currentUser', JSON.stringify(user))
+    sessionStorage.setItem('token', token)
+
+    ElMessage.success('登录成功')
+    router.push('/home')
   } finally {
     loading.value = false
   }
@@ -113,12 +118,12 @@ const handleRegister = async () => {
   }
   loading.value = true
   try {
-    const res = await register(f.username, f.password, f.confirmPassword, f.realName, f.role)
+    const res = await register(f.username, f.password, f.confirmPassword, f.realName, f.role, f.phone, f.email)
     if (res.success) {
       ElMessage.success('注册成功，请登录')
       isRegister.value = false
       loginForm.value.username = f.username
-      registerForm.value = { username: '', password: '', confirmPassword: '', realName: '', role: '' }
+      registerForm.value = { username: '', password: '', confirmPassword: '', realName: '', phone: '', email: '', role: '' }
     }
   } finally {
     loading.value = false

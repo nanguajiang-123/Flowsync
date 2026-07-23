@@ -1,5 +1,5 @@
 <template>
-  <div style="max-width:600px;">
+  <div style="max-width:760px; margin: 0 auto;">
     <!-- 个人信息卡片 -->
     <el-card shadow="hover" style="margin-bottom:20px;">
       <template #header><span>👤 个人资料</span></template>
@@ -19,7 +19,7 @@
     <!-- 修改密码 -->
     <el-card shadow="hover">
       <template #header><span>🔒 修改密码</span></template>
-      <el-form :model="pwdForm" label-width="100px" style="max-width:400px;">
+      <el-form :model="pwdForm" label-width="110px" style="max-width:480px; margin: 0 auto;">
         <el-form-item label="旧密码" required>
           <el-input v-model="pwdForm.oldPassword" type="password" show-password />
         </el-form-item>

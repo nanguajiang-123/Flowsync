@@ -2,8 +2,8 @@
   <div class="home-container">
     <!-- 左侧菜单 -->
     <div class="home-aside">
-      <div style="padding:16px;text-align:center;color:#fff;font-size:18px;font-weight:600;letter-spacing:2px;">
-        🔗 FlowSync
+      <div style="padding:18px 16px 12px;text-align:center;color:#fff;font-size:18px;font-weight:600;letter-spacing:2px;">
+        FlowSync
       </div>
       <el-menu
         :default-active="activeMenu"
@@ -14,22 +14,22 @@
       >
         <el-sub-menu index="workbench">
           <template #title><el-icon><DataAnalysis /></el-icon> 工作台</template>
-          <el-menu-item index="overview">📊 总览</el-menu-item>
+          <el-menu-item index="overview">总览</el-menu-item>
         </el-sub-menu>
 
         <el-sub-menu index="business">
           <template #title><el-icon><Briefcase /></el-icon> 业务管理</template>
-          <el-menu-item index="project">📁 项目管理</el-menu-item>
-          <el-menu-item v-if="isLeader" index="task-decompose">🤖 任务拆解</el-menu-item>
-          <el-menu-item index="task">📋 任务管理</el-menu-item>
-          <el-menu-item index="progress">📝 进度跟踪</el-menu-item>
-          <el-menu-item index="summary">📄 总结中心</el-menu-item>
+          <el-menu-item index="project">项目管理</el-menu-item>
+          <el-menu-item v-if="isLeader" index="task-decompose">任务拆解</el-menu-item>
+          <el-menu-item index="task">任务管理</el-menu-item>
+          <el-menu-item index="progress">进度跟踪</el-menu-item>
+          <el-menu-item index="summary">总结中心</el-menu-item>
         </el-sub-menu>
 
         <el-sub-menu index="system">
           <template #title><el-icon><Setting /></el-icon> 系统信息</template>
-          <el-menu-item index="members">👥 成员列表</el-menu-item>
-          <el-menu-item index="profile">👤 个人信息</el-menu-item>
+          <el-menu-item index="members">成员列表</el-menu-item>
+          <el-menu-item index="profile">个人信息</el-menu-item>
         </el-sub-menu>
       </el-menu>
     </div>
@@ -40,7 +40,7 @@
       <div class="home-header">
         <span style="font-size:16px;color:#303133;">{{ panelTitle }}</span>
         <div class="user-info">
-          <span style="color:#606266;">👤 {{ currentUser?.realName }}（{{ currentUser?.role }}）</span>
+          <span style="color:#606266;">{{ currentUser?.realName }}（{{ currentUser?.role }}）</span>
           <el-button size="small" @click="handleLogout">退出登录</el-button>
         </div>
       </div>
@@ -80,14 +80,14 @@ const currentUser = ref(null)
 const isLeader = computed(() => currentUser.value?.role === '负责人' || currentUser.value?.role === '管理员')
 
 const panelTitleMap = {
-  'overview': '📊 工作台总览',
-  'project': '📁 项目管理',
-  'task-decompose': '🤖 AI 任务拆解',
-  'task': '📋 任务管理',
-  'progress': '📝 进度跟踪',
-  'summary': '📄 总结中心',
-  'members': '👥 成员列表',
-  'profile': '👤 个人信息'
+  'overview': '工作台总览',
+  'project': '项目管理',
+  'task-decompose': 'AI 任务拆解',
+  'task': '任务管理',
+  'progress': '进度跟踪',
+  'summary': '总结中心',
+  'members': '成员列表',
+  'profile': '个人信息'
 }
 const panelTitle = computed(() => panelTitleMap[activeMenu.value] || '')
 
