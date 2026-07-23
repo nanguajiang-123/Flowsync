@@ -22,7 +22,7 @@ public class AuthController {
         this.userService = userService;
     }
 
-    @Operation(summary = "用户注册")
+    @Operation(summary = "用户注册", security = {})
     @PostMapping("/register")
     public ApiResponse<?> register(@RequestBody RegisterRequest request) {
         try {
@@ -39,7 +39,7 @@ public class AuthController {
         }
     }
 
-    @Operation(summary = "用户登录")
+    @Operation(summary = "用户登录", security = {})
     @PostMapping("/login")
     public ApiResponse<?> login(@RequestBody LoginRequest request) {
         try {
