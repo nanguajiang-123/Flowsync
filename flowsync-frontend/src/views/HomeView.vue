@@ -29,6 +29,7 @@
         <el-sub-menu index="system">
           <template #title><el-icon><Setting /></el-icon> 系统信息</template>
           <el-menu-item index="members">成员列表</el-menu-item>
+          <el-menu-item v-if="isLeader" index="operation-log">操作记录</el-menu-item>
           <el-menu-item index="profile">个人信息</el-menu-item>
         </el-sub-menu>
       </el-menu>
@@ -38,7 +39,7 @@
     <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
       <!-- 顶部栏 -->
       <div class="home-header">
-        <span style="font-size:16px;color:#303133;">{{ panelTitle }}</span>
+        <span class="home-header-title">{{ panelTitle }}</span>
         <div class="user-info">
           <span style="color:#606266;">{{ currentUser?.realName }}（{{ currentUser?.role }}）</span>
           <el-button size="small" @click="handleLogout">退出登录</el-button>
@@ -54,6 +55,7 @@
         <ProgressPanel     v-if="activeMenu === 'progress'"       :current-user="currentUser" />
         <SummaryPanel      v-if="activeMenu === 'summary'"        :current-user="currentUser" />
         <MemberPanel       v-if="activeMenu === 'members'"        :current-user="currentUser" />
+        <OperationLogPanel v-if="activeMenu === 'operation-log'" :current-user="currentUser" />
         <ProfilePanel      v-if="activeMenu === 'profile'"        :current-user="currentUser" />
       </div>
     </div>
@@ -71,6 +73,7 @@ import TaskPanel from '../components/TaskPanel.vue'
 import ProgressPanel from '../components/ProgressPanel.vue'
 import SummaryPanel from '../components/SummaryPanel.vue'
 import MemberPanel from '../components/MemberPanel.vue'
+import OperationLogPanel from '../components/OperationLogPanel.vue'
 import ProfilePanel from '../components/ProfilePanel.vue'
 
 const router = useRouter()
@@ -87,6 +90,7 @@ const panelTitleMap = {
   'progress': '进度跟踪',
   'summary': '总结中心',
   'members': '成员列表',
+  'operation-log': '操作记录',
   'profile': '个人信息'
 }
 const panelTitle = computed(() => panelTitleMap[activeMenu.value] || '')

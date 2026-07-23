@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="margin-bottom:16px;">
-      <el-button type="primary" @click="openAddDialog">
+      <el-button class="create-action-btn" @click="openAddDialog">
         <el-icon><Plus /></el-icon> 新增总结
       </el-button>
     </div>

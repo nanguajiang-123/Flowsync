@@ -2,7 +2,7 @@
   <div>
     <!-- Step 1: 输入区域 -->
     <el-card shadow="hover" style="margin-bottom:20px;">
-      <template #header>🤖 AI 智能任务拆解</template>
+      <template #header>任务拆解</template>
       <el-form label-width="100px">
         <el-form-item label="选择项目" required>
           <el-select v-model="selectedProject" style="width:100%" placeholder="请选择项目">
@@ -11,16 +11,15 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="generatePlan" :loading="aiLoading" :disabled="!selectedProject">
-            🤖 AI 智能拆解任务
+            智能拆解任务
           </el-button>
           <span style="margin-left:12px;color:#909399;font-size:13px;">AI 将根据项目名称自动拆解并分配负责人</span>
         </el-form-item>
       </el-form>
     </el-card>
 
-    <!-- Step 2: AI 拆解结果 -->
+    <!-- Step 2: 任务列表 -->
     <el-card v-if="planItems.length > 0" shadow="hover">
-      <template #header>📋 AI 拆解结果（共 {{ planItems.length }} 条任务）</template>
       <el-table :data="planItems" border stripe style="width:100%"
                 @selection-change="onSelectionChange" ref="planTable">
         <el-table-column type="selection" width="50" />
@@ -49,7 +48,7 @@
       </el-table>
       <div style="margin-top:16px;text-align:right;">
         <el-button type="success" @click="importTasks" :disabled="selectedRows.length === 0">
-          📥 导入选中任务 ({{ selectedRows.length }})
+          导入选中任务 ({{ selectedRows.length }})
         </el-button>
       </div>
     </el-card>

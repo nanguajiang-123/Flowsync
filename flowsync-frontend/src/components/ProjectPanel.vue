@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="margin-bottom:16px;">
-      <el-button v-if="isLeader" type="primary" @click="openAddDialog">
+      <el-button v-if="isLeader" class="create-action-btn" @click="openAddDialog">
         <el-icon><Plus /></el-icon> 新建项目
       </el-button>
     </div>

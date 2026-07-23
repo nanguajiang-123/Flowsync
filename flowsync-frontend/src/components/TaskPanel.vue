@@ -5,7 +5,7 @@
       <el-select v-model="filterProjectId" placeholder="按项目筛选" clearable style="width:220px" @change="loadData">
         <el-option v-for="p in projects" :key="p.id" :label="p.name" :value="p.id" />
       </el-select>
-      <el-button v-if="isLeader" type="primary" @click="openAddDialog">
+      <el-button v-if="isLeader" class="create-action-btn" @click="openAddDialog">
         <el-icon><Plus /></el-icon> 新建任务
       </el-button>
     </div>

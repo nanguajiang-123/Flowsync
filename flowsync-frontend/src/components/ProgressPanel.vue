@@ -4,7 +4,7 @@
       <el-select v-model="filterTaskId" placeholder="按任务筛选" clearable style="width:220px" @change="loadData">
         <el-option v-for="t in tasks" :key="t.id" :label="`#${t.id} ${t.title}`" :value="t.id" />
       </el-select>
-      <el-button type="primary" @click="openAddDialog">
+      <el-button class="create-action-btn" @click="openAddDialog">
         <el-icon><Plus /></el-icon> 新增进度记录
       </el-button>
     </div>

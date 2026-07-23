@@ -6,6 +6,13 @@ const request = axios.create({
   timeout: 15000
 })
 
+const normalizeResponseData = (data) => {
+  if (data && typeof data === 'object' && Object.prototype.hasOwnProperty.call(data, 'success')) {
+    return data
+  }
+  return { success: true, message: '操作成功', data }
+}
+
 // 不需要 currentUserId 的接口
 const shouldSkipCurrentUserId = (url = '') => {
   return (
@@ -49,7 +56,7 @@ request.interceptors.request.use(
 // 响应拦截器：统一错误提示
 request.interceptors.response.use(
   response => {
-    const data = response.data
+    const data = normalizeResponseData(response.data)
 
     if (data && data.success === false) {
       ElMessage.error(data.message || '操作失败')
