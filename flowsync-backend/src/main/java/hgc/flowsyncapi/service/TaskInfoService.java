@@ -10,8 +10,8 @@ public interface TaskInfoService {
     List<TaskInfo> listTasks(Long projectId);
 
     /** 新增或编辑任务：有 id 则更新，无 id 则新增 */
-    TaskInfo saveTask(TaskInfo task);
+    TaskInfo saveTask(TaskInfo task, Long operatorId);
 
     /** 删除任务 */
-    void deleteTask(Long id);
+    void deleteTask(Long id, Long operatorId);
 }

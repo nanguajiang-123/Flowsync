@@ -36,7 +36,7 @@ public class TaskLogController {
 
         return ApiResponse.ok(
                 "新增成功",
-                taskLogService.addTaskLog(taskLog)
+                taskLogService.addTaskLog(taskLog, currentUserId)
         );
     }
 }

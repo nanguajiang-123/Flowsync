@@ -85,7 +85,7 @@ public class AiController {
                     task.setDueDate(LocalDate.now().plusDays(7));
                 }
             }
-            taskInfoService.saveTask(task);
+            taskInfoService.saveTask(task, request.getCreatorId());
             imported.add(task);
         }
         log.info("导入 AI 任务: {} 条", imported.size());

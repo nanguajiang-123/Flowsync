@@ -35,7 +35,7 @@ public class TaskSummaryController {
 
         return ApiResponse.ok(
                 "新增成功",
-                taskSummaryService.addSummary(summary)
+                taskSummaryService.addSummary(summary, currentUserId)
         );
     }
 }

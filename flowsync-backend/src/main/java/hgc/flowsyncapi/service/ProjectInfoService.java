@@ -6,12 +6,12 @@ import java.util.List;
 
 public interface ProjectInfoService {
 
-    /** 获取全部项目（按 id 倒序） */
-    List<ProjectInfo> listProjects();
+    /** 获取项目列表（按 id 倒序），可选按负责人筛选 */
+    List<ProjectInfo> listProjects(Long ownerId);
 
     /** 新增或编辑项目：有 id 则更新，无 id 则新增 */
-    ProjectInfo saveProject(ProjectInfo project);
+    ProjectInfo saveProject(ProjectInfo project, Long operatorId);
 
     /** 删除项目 */
-    void deleteProject(Long id);
+    void deleteProject(Long id, Long operatorId);
 }

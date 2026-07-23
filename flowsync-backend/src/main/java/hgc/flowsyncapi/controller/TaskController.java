@@ -50,7 +50,7 @@ public class TaskController {
 
             return ApiResponse.ok(
                     "保存成功",
-                    taskInfoService.saveTask(task)
+                    taskInfoService.saveTask(task, currentUserId)
             );
         } catch (Exception e) {
             log.error("保存任务失败", e);
@@ -60,9 +60,10 @@ public class TaskController {
 
     @Operation(summary = "删除任务")
     @DeleteMapping("/{id}")
-    public ApiResponse<?> delete(@PathVariable Long id) {
+    public ApiResponse<?> delete(@PathVariable Long id,
+                                  @RequestParam Long currentUserId) {
         try {
-            taskInfoService.deleteTask(id);
+            taskInfoService.deleteTask(id, currentUserId);
             return ApiResponse.ok("删除成功");
         } catch (Exception e) {
             log.error("删除任务失败", e);
