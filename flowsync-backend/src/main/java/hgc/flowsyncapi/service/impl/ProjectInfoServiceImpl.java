@@ -38,14 +38,12 @@ public class ProjectInfoServiceImpl implements ProjectInfoService {
 
         if (isUpdate) {
             projectInfoMapper.updateById(project);
-            // 记录操作日志
             operationLogService.record(operatorId, "PROJECT", "UPDATE",
                     project.getId(),
                     "更新了项目「" + project.getName() + "」",
                     project.getId());
         } else {
             projectInfoMapper.insert(project);
-            // 记录操作日志（此时 project.getId() 已被 MyBatis-Plus 回填）
             operationLogService.record(operatorId, "PROJECT", "CREATE",
                     project.getId(),
                     "创建了项目「" + project.getName() + "」",
@@ -58,7 +56,6 @@ public class ProjectInfoServiceImpl implements ProjectInfoService {
     public void deleteProject(Long id, Long operatorId) {
         ProjectInfo project = projectInfoMapper.selectById(id);
         if (project != null) {
-            // 先记录日志，再删除
             operationLogService.record(operatorId, "PROJECT", "DELETE",
                     id,
                     "删除了项目「" + project.getName() + "」",

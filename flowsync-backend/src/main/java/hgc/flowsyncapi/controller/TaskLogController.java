@@ -2,6 +2,7 @@ package hgc.flowsyncapi.controller;
 
 import hgc.flowsyncapi.common.ApiResponse;
 import hgc.flowsyncapi.entity.TaskLog;
+import hgc.flowsyncapi.security.SecurityUtils;
 import hgc.flowsyncapi.service.TaskLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,16 +28,9 @@ public class TaskLogController {
 
     @Operation(summary = "新增进度记录")
     @PostMapping("/add")
-    public ApiResponse<?> add(
-            @RequestParam Long currentUserId,
-            @RequestBody TaskLog taskLog) {
-
-        // 操作人必须以当前登录用户为准
-        taskLog.setOperatorId(currentUserId);
-
-        return ApiResponse.ok(
-                "新增成功",
-                taskLogService.addTaskLog(taskLog, currentUserId)
-        );
+    public ApiResponse<?> add(@RequestBody TaskLog taskLog) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        return ApiResponse.ok("新增成功",
+                taskLogService.addTaskLog(taskLog, currentUserId));
     }
 }

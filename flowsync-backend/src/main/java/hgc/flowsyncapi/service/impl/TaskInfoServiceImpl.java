@@ -56,7 +56,6 @@ public class TaskInfoServiceImpl implements TaskInfoService {
     public void deleteTask(Long id, Long operatorId) {
         TaskInfo task = taskInfoMapper.selectById(id);
         if (task != null) {
-            // 先记录日志，再删除
             operationLogService.record(operatorId, "TASK", "DELETE",
                     id,
                     "删除了任务「" + task.getTitle() + "」",

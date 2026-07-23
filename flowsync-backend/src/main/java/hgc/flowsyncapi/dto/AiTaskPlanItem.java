@@ -1,10 +1,12 @@
 package hgc.flowsyncapi.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
 /**
  * AI 拆解返回的单条任务 —— 新格式（JSON 数组）
  */
+@Data
 public class AiTaskPlanItem {
 
     @JsonProperty("projectname")
@@ -30,38 +32,4 @@ public class AiTaskPlanItem {
     private String title;        // 兼容前端显示，映射自 taskdesc
     private String description;  // 兼容前端显示
     private Integer suggestedDays;
-
-    // ---- getters / setters ----
-    public String getProjectname() { return projectname; }
-    public void setProjectname(String projectname) { this.projectname = projectname; }
-
-    public String getTaskdesc() { return taskdesc; }
-    public void setTaskdesc(String taskdesc) { this.taskdesc = taskdesc; }
-
-    public String getAssignee() { return assignee; }
-    public void setAssignee(String assignee) { this.assignee = assignee; }
-
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-
-    public String getPriority() { return priority; }
-    public void setPriority(String priority) { this.priority = priority; }
-
-    public String getDueDate() { return dueDate; }
-    public void setDueDate(String dueDate) { this.dueDate = dueDate; }
-
-    public String getCreateTime() { return createTime; }
-    public void setCreateTime(String createTime) { this.createTime = createTime; }
-
-    public Long getAssigneeId() { return assigneeId; }
-    public void setAssigneeId(Long assigneeId) { this.assigneeId = assigneeId; }
-
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
-
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-
-    public Integer getSuggestedDays() { return suggestedDays; }
-    public void setSuggestedDays(Integer suggestedDays) { this.suggestedDays = suggestedDays; }
 }

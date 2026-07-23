@@ -16,6 +16,7 @@ target/
 # ====== Node / Vue ======
 node_modules/
 dist/
+.env
 .env.local
 .env.*.local
 *.log
@@ -32,3 +33,5 @@ mysql-data/
 # ====== Secrets ======
 *.pem
 *.key
+application*.yml
+!application*.sample.yml
