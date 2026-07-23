@@ -2,12 +2,12 @@ package hgc.flowsyncapi.controller;
 
 import hgc.flowsyncapi.common.ApiResponse;
 import hgc.flowsyncapi.entity.ProjectInfo;
+import hgc.flowsyncapi.security.SecurityUtils;
 import hgc.flowsyncapi.service.ProjectInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.Parameter;
 
 @Tag(name = "项目管理", description = "项目的增删改查")
 @RestController
@@ -28,25 +28,20 @@ public class ProjectController {
 
     @Operation(summary = "新增或编辑项目")
     @PostMapping("/save")
-    public ApiResponse<?> save(
-            @RequestParam Long currentUserId,
-            @RequestBody ProjectInfo project) {
-
+    public ApiResponse<?> save(@RequestBody ProjectInfo project) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
         // 仅新增项目时，自动将当前登录用户设为负责人
         if (project.getId() == null) {
             project.setOwnerId(currentUserId);
         }
-
-        return ApiResponse.ok(
-                "保存成功",
-                projectInfoService.saveProject(project, currentUserId)
-        );
+        return ApiResponse.ok("保存成功",
+                projectInfoService.saveProject(project, currentUserId));
     }
 
     @Operation(summary = "删除项目")
     @DeleteMapping("/{id}")
-    public ApiResponse<?> delete(@PathVariable Long id,
-                                  @RequestParam Long currentUserId) {
+    public ApiResponse<?> delete(@PathVariable Long id) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
         projectInfoService.deleteProject(id, currentUserId);
         return ApiResponse.ok("删除成功");
     }

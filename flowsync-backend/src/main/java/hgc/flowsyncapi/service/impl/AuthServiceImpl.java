@@ -3,26 +3,29 @@ package hgc.flowsyncapi.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import hgc.flowsyncapi.entity.User;
 import hgc.flowsyncapi.mapper.UserMapper;
+import hgc.flowsyncapi.security.JwtUtils;
 import hgc.flowsyncapi.service.AuthService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
     public AuthServiceImpl(
             UserMapper userMapper,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            JwtUtils jwtUtils) {
 
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
@@ -52,10 +55,8 @@ public class AuthServiceImpl implements AuthService {
         // 返回给前端前清除密码字段
         user.setPassword(null);
 
-        // 暂时保留原来的简单 token，JWT 后续再实现
-        String token = UUID.randomUUID()
-                .toString()
-                .replace("-", "");
+        // 生成 JWT Token
+        String token = jwtUtils.generateToken(user.getId(), user.getUsername(), user.getRole());
 
         Map<String, Object> result = new HashMap<>();
         result.put("user", user);

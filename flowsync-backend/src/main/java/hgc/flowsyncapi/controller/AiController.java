@@ -3,6 +3,7 @@ package hgc.flowsyncapi.controller;
 import hgc.flowsyncapi.common.ApiResponse;
 import hgc.flowsyncapi.dto.*;
 import hgc.flowsyncapi.entity.TaskInfo;
+import hgc.flowsyncapi.security.SecurityUtils;
 import hgc.flowsyncapi.service.QwenService;
 import hgc.flowsyncapi.service.TaskInfoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -68,6 +69,7 @@ public class AiController {
             return ApiResponse.fail("没有要导入的任务");
         }
 
+        Long currentUserId = SecurityUtils.getCurrentUserId();
         List<TaskInfo> imported = new ArrayList<>();
         for (AiTaskPlanItem item : request.getItems()) {
             TaskInfo task = new TaskInfo();
@@ -77,7 +79,7 @@ public class AiController {
             task.setPriority(item.getPriority() != null ? item.getPriority() : "中");
             task.setStatus("未开始");
             task.setAssigneeId(item.getAssigneeId());
-            task.setCreatorId(request.getCreatorId());
+            task.setCreatorId(currentUserId);
             if (item.getDueDate() != null && !item.getDueDate().isEmpty()) {
                 try {
                     task.setDueDate(LocalDate.parse(item.getDueDate()));
@@ -85,7 +87,7 @@ public class AiController {
                     task.setDueDate(LocalDate.now().plusDays(7));
                 }
             }
-            taskInfoService.saveTask(task, request.getCreatorId());
+            taskInfoService.saveTask(task, currentUserId);
             imported.add(task);
         }
         log.info("导入 AI 任务: {} 条", imported.size());

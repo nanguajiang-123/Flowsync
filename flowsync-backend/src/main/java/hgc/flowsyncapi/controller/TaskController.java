@@ -2,6 +2,7 @@ package hgc.flowsyncapi.controller;
 
 import hgc.flowsyncapi.common.ApiResponse;
 import hgc.flowsyncapi.entity.TaskInfo;
+import hgc.flowsyncapi.security.SecurityUtils;
 import hgc.flowsyncapi.service.TaskInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,20 +39,15 @@ public class TaskController {
 
     @Operation(summary = "新增或编辑任务")
     @PostMapping("/save")
-    public ApiResponse<?> save(
-            @RequestParam Long currentUserId,
-            @RequestBody TaskInfo task) {
-
+    public ApiResponse<?> save(@RequestBody TaskInfo task) {
         try {
+            Long currentUserId = SecurityUtils.getCurrentUserId();
             // 只有创建新任务时才设置创建人
             if (task.getId() == null) {
                 task.setCreatorId(currentUserId);
             }
-
-            return ApiResponse.ok(
-                    "保存成功",
-                    taskInfoService.saveTask(task, currentUserId)
-            );
+            return ApiResponse.ok("保存成功",
+                    taskInfoService.saveTask(task, currentUserId));
         } catch (Exception e) {
             log.error("保存任务失败", e);
             return ApiResponse.fail("保存任务失败: " + e.getMessage());
@@ -60,9 +56,9 @@ public class TaskController {
 
     @Operation(summary = "删除任务")
     @DeleteMapping("/{id}")
-    public ApiResponse<?> delete(@PathVariable Long id,
-                                  @RequestParam Long currentUserId) {
+    public ApiResponse<?> delete(@PathVariable Long id) {
         try {
+            Long currentUserId = SecurityUtils.getCurrentUserId();
             taskInfoService.deleteTask(id, currentUserId);
             return ApiResponse.ok("删除成功");
         } catch (Exception e) {

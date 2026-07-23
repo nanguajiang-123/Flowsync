@@ -2,6 +2,7 @@ package hgc.flowsyncapi.controller;
 
 import hgc.flowsyncapi.common.ApiResponse;
 import hgc.flowsyncapi.dto.PasswordUpdateRequest;
+import hgc.flowsyncapi.security.SecurityUtils;
 import hgc.flowsyncapi.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,11 +27,9 @@ public class UserController {
 
     @Operation(summary = "修改密码")
     @PostMapping("/update-password")
-    public ApiResponse<?> updatePassword(
-            @RequestParam Long currentUserId,
-            @RequestBody PasswordUpdateRequest request) {
-
+    public ApiResponse<?> updatePassword(@RequestBody PasswordUpdateRequest request) {
         try {
+            Long currentUserId = SecurityUtils.getCurrentUserId();
             userService.updatePassword(
                     currentUserId,
                     request.getOldPassword(),

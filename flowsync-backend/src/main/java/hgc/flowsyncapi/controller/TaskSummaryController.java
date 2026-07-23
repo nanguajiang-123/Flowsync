@@ -2,6 +2,7 @@ package hgc.flowsyncapi.controller;
 
 import hgc.flowsyncapi.common.ApiResponse;
 import hgc.flowsyncapi.entity.TaskSummary;
+import hgc.flowsyncapi.security.SecurityUtils;
 import hgc.flowsyncapi.service.TaskSummaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,16 +27,9 @@ public class TaskSummaryController {
 
     @Operation(summary = "新增总结")
     @PostMapping("/add")
-    public ApiResponse<?> add(
-            @RequestParam Long currentUserId,
-            @RequestBody TaskSummary summary) {
-
-        // 总结创建人以当前登录用户为准
-        summary.setCreatedBy(currentUserId);
-
-        return ApiResponse.ok(
-                "新增成功",
-                taskSummaryService.addSummary(summary, currentUserId)
-        );
+    public ApiResponse<?> add(@RequestBody TaskSummary summary) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        return ApiResponse.ok("新增成功",
+                taskSummaryService.addSummary(summary, currentUserId));
     }
 }
