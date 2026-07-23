@@ -112,7 +112,7 @@ const importTasks = async () => {
   }
 
   try {
-    const res = await importTaskPlan(selectedProject.value, props.currentUser?.id, selectedRows.value)
+    const res = await importTaskPlan(selectedProject.value, selectedRows.value)
     if (res.success) {
       ElMessage.success(res.message || '导入成功')
       planItems.value = []

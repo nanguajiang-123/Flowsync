@@ -94,8 +94,7 @@ const loadData = async () => {
 
   loading.value = true
   try {
-    const currentUserId = props.currentUser?.id
-    const res = await getOperationLogs(selectedProjectId.value, currentUserId)
+    const res = await getOperationLogs(selectedProjectId.value)
     logs.value = getListFromPayload(res)
   } catch (e) {
     logs.value = []
