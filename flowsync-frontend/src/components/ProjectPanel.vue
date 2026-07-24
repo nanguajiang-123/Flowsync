@@ -110,7 +110,10 @@ const openEditDialog = (row) => {
 const submitForm = async () => {
   if (!form.value.name) { ElMessage.warning('请输入项目名称'); return }
   try {
-    await saveProject(form.value)
+    // 清理不应发送到后端的字段：ownerId 由后端 JWT 获取
+    const payload = { ...form.value }
+    delete payload.ownerId
+    await saveProject(payload)
     ElMessage.success(isEdit.value ? '修改成功' : '新建成功')
     dialogVisible.value = false
     loadData()

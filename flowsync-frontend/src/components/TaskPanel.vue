@@ -162,7 +162,13 @@ const openStatusDialog = (row) => {
 const submitForm = async () => {
   if (!form.value.projectId || !form.value.title) { ElMessage.warning('请完善必填字段'); return }
   try {
-    await saveTask(form.value)
+    // 清理不应发送到后端的字段：creatorId 由后端 JWT 获取，parentId 为 0 视为 null
+    const payload = { ...form.value }
+    delete payload.creatorId
+    if (payload.parentId === 0 || payload.parentId === null || payload.parentId === undefined) {
+      payload.parentId = null
+    }
+    await saveTask(payload)
     ElMessage.success('保存成功')
     dialogVisible.value = false
     loadData()

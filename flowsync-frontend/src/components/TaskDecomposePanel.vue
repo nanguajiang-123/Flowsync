@@ -37,11 +37,8 @@
         <el-table-column label="截止日期" prop="dueDate" width="120" align="center" />
         <el-table-column label="负责人调整" width="160" align="center">
           <template #default="{ $index }">
-            <el-select v-model="planItems[$index].assigneeId" style="width:130px" size="small">
-              <el-option label="项目负责人" :value="2" />
-              <el-option label="张三" :value="3" />
-              <el-option label="李四" :value="4" />
-              <el-option label="系统管理员" :value="1" />
+            <el-select v-model="planItems[$index].assigneeId" style="width:130px" size="small" clearable placeholder="选择负责人">
+              <el-option v-for="u in users" :key="u.id" :label="u.realName" :value="u.id" />
             </el-select>
           </template>
         </el-table-column>
@@ -59,11 +56,13 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getProjects } from '../api/project'
+import { getUsers } from '../api/user'
 import { getTaskPlan, importTaskPlan } from '../api/ai'
 
 const props = defineProps({ currentUser: Object })
 
 const projects = ref([])
+const users = ref([])
 const selectedProject = ref(null)
 const aiLoading = ref(false)
 const planItems = ref([])
@@ -77,8 +76,9 @@ const onSelectionChange = (rows) => { selectedRows.value = rows }
 
 const loadProjects = async () => {
   try {
-    const res = await getProjects()
-    if (res.success) projects.value = res.data || []
+    const [projRes, userRes] = await Promise.all([getProjects(), getUsers()])
+    if (projRes.success) projects.value = projRes.data || []
+    if (userRes.success) users.value = userRes.data || []
   } catch (e) {}
 }
 

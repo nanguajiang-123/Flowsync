@@ -68,19 +68,10 @@ const projects = ref([])
 const selectedProjectId = ref('')
 const loading = ref(false)
 
-const getListFromPayload = (payload) => {
-  const data = payload?.data ?? payload
-  if (Array.isArray(data)) return data
-  if (Array.isArray(data?.data)) return data.data
-  if (Array.isArray(data?.list)) return data.list
-  if (Array.isArray(data?.items)) return data.items
-  return []
-}
-
 const loadProjects = async () => {
   try {
     const res = await getProjects()
-    projects.value = getListFromPayload(res)
+    projects.value = res?.data || []
   } catch (e) {
     projects.value = []
   }
@@ -95,7 +86,7 @@ const loadData = async () => {
   loading.value = true
   try {
     const res = await getOperationLogs(selectedProjectId.value)
-    logs.value = getListFromPayload(res)
+    logs.value = res?.data || []
   } catch (e) {
     logs.value = []
   } finally {
